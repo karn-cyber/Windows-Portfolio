@@ -5,13 +5,15 @@ import Image from 'next/image'
 
 export default function LoginScreen({ onLogin }) {
   const [selectedUser, setSelectedUser] = useState(null)
+  const [showWelcome, setShowWelcome] = useState(false)
 
   const handleUserClick = () => {
     setSelectedUser(true)
-    // Auto-login after selection
+    setShowWelcome(true)
+    // Auto-login after showing welcome
     setTimeout(() => {
       onLogin()
-    }, 800)
+    }, 2000)
   }
 
   const handleRestart = () => {
@@ -32,55 +34,64 @@ export default function LoginScreen({ onLogin }) {
           backgroundSize: '20px 20px'
         }}
       >
-        {/* Content Container */}
-        <div className="flex items-center justify-center h-full gap-0">
-          {/* Left Section - Logo and Text */}
-          <div className="flex flex-col items-center justify-center w-1/2 px-10">
-            <div className="flex flex-col items-center">
-              <Image
-                src="/images/XPLOGO.png"
-                alt="XP Logo"
-                width={150}
-                height={150}
-                className="w-36 h-36 mb-6"
-              />
-              <h1 className="text-white text-7xl font-semibold tracking-tight mb-2">
-                Neelanshu
-                <span className="text-orange-400 text-5xl font-bold italic ml-2">XP</span>
-              </h1>
-              <p className="text-white/90 text-xl italic text-center mt-4">
-                To begin, click on Neelanshu to log in
-              </p>
-            </div>
-          </div>
-
-          {/* Vertical Divider Line */}
-          <div className="h-96 w-px bg-white/30"></div>
-
-          {/* Right Section - User Card */}
-          <div className="flex items-center justify-center w-1/2 px-10">
-            <div 
-              onClick={handleUserClick}
-              className={`flex items-center gap-6 cursor-pointer transition-transform duration-300 ${
-                selectedUser ? 'scale-105' : 'hover:scale-105'
-              }`}
-            >
-              <div className="bg-[#7398c9] p-5 rounded-xl shadow-lg">
+        {!showWelcome ? (
+          /* Login Screen Content */
+          <div className="flex items-center justify-center h-full gap-0">
+            {/* Left Section - Logo and Text */}
+            <div className="flex flex-col items-center justify-center w-1/2 px-10">
+              <div className="flex flex-col items-center">
                 <Image
-                  src="/images/boy.png"
-                  alt="User Avatar"
-                  width={140}
-                  height={140}
-                  className="w-32 h-32 rounded-md"
+                  src="/images/XPLOGO.png"
+                  alt="XP Logo"
+                  width={150}
+                  height={150}
+                  className="w-36 h-36 mb-6"
                 />
+                <h1 className="text-white text-7xl font-semibold tracking-tight mb-2">
+                  Neelanshu
+                  <span className="text-orange-400 text-4xl font-bold italic align-super relative -top-4 ml-1">XP</span>
+                </h1>
+                <p className="text-white/90 text-xl italic text-center mt-4">
+                  To begin, click on Neelanshu to log in
+                </p>
               </div>
-              <div className="flex flex-col">
-                <h2 className="text-white font-semibold text-4xl mb-2">Neelanshu</h2>
-                <p className="text-blue-/90 text-bold-xl italic">Visual Designer</p>
+            </div>
+
+            {/* Vertical Divider Line */}
+            <div className="h-96 w-px bg-white/30"></div>
+
+            {/* Right Section - User Card */}
+            <div className="flex items-center justify-center w-1/2 px-10">
+              <div 
+                onClick={handleUserClick}
+                className={`flex items-center gap-6 cursor-pointer transition-transform duration-300 ${
+                  selectedUser ? 'scale-105' : 'hover:scale-105'
+                }`}
+              >
+                <div className="bg-[#7398c9] p-5 rounded-xl shadow-lg">
+                  <Image
+                    src="/images/boy.png"
+                    alt="User Avatar"
+                    width={140}
+                    height={140}
+                    className="w-32 h-32 rounded-md"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <h2 className="text-white font-semibold text-4xl mb-2">Neelanshu</h2>
+                  <p className="text-blue-/90 text-bold-xl italic">Visual Designer</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Welcome Screen */
+          <div className="flex items-center justify-center h-full">
+            <h1 className="text-white text-8xl font-bold italic tracking-wide animate-none">
+              Welcome
+            </h1>
+          </div>
+        )}
       </div>
 
       {/* Bottom Blue Bar */}

@@ -11,6 +11,15 @@ export default function Desktop() {
   const [selectedIcons, setSelectedIcons] = useState([])
   const [time, setTime] = useState(new Date())
 
+  // Play Windows XP startup sound
+  useEffect(() => {
+    const audio = new Audio('/sounds/startup.mp3')
+    audio.volume = 0.5 // Set volume to 50%
+    audio.play().catch(error => {
+      console.log('Audio playback failed:', error)
+    })
+  }, [])
+
   // Update time every minute
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,13 +33,13 @@ export default function Desktop() {
     {
       id: 'my-computer',
       name: 'My Computer',
-      icon: '💻',
+      icon: '�️',
       type: 'system'
     },
     {
       id: 'my-documents',
       name: 'My Documents',
-      icon: '📁',
+      icon: '�',
       type: 'folder'
     },
     {
@@ -40,27 +49,36 @@ export default function Desktop() {
       type: 'system'
     },
     {
+      id: 'notion-beta',
+      name: 'Notion Beta',
+      icon: '🌐',
+      type: 'link',
+      url: 'https://notion-beta-neel.vercel.app/'
+    },
+    {
+      id: 'start-it',
+      name: 'Start-It App',
+      icon: '🚀',
+      type: 'link',
+      url: 'https://start-it-app.vercel.app/'
+    },
+    {
+      id: 'resume',
+      name: 'Resume.pdf',
+      icon: '📄',
+      type: 'pdf',
+      file: '/Resume-Neelanshu Karn (4).pdf'
+    },
+    {
       id: 'portfolio',
       name: 'Portfolio',
       icon: '👨‍💻',
       type: 'application'
     },
     {
-      id: 'resume',
-      name: 'Resume.pdf',
-      icon: '📄',
-      type: 'file'
-    },
-    {
-      id: 'projects',
-      name: 'My Projects',
-      icon: '⚡',
-      type: 'folder'
-    },
-    {
       id: 'contact',
       name: 'Contact Me',
-      icon: '📧',
+      icon: '✉️',
       type: 'application'
     }
   ]
@@ -87,6 +105,18 @@ export default function Desktop() {
   }
 
   const handleIconDoubleClick = (icon) => {
+    // Handle external links
+    if (icon.type === 'link' && icon.url) {
+      window.open(icon.url, '_blank')
+      return
+    }
+    
+    // Handle PDF
+    if (icon.type === 'pdf' && icon.file) {
+      window.open(icon.file, '_blank')
+      return
+    }
+    
     // Open window based on icon type
     const newWindow = {
       id: `window-${Date.now()}`,
@@ -132,16 +162,10 @@ export default function Desktop() {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat cursor-default"
         style={{
-          backgroundImage: `linear-gradient(135deg, #5A9FD4 0%, #306998 25%, #3E7CB8 50%, #5A9FD4 75%, #7BB8E3 100%)`
+          backgroundImage: `url('/images/background.png')`
         }}
         onClick={handleDesktopClick}
       >
-        {/* Desktop pattern overlay */}
-        <div className="absolute inset-0 opacity-10 bg-repeat" 
-             style={{
-               backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`
-             }}>
-        </div>
       </div>
 
       {/* Desktop Icons */}

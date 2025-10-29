@@ -1,16 +1,20 @@
 'use client'
 
+import { useState, useRef, useEffect } from 'react'
+
 export default function WindowContent({ window }) {
   const renderContent = () => {
     switch (window.type) {
+      case 'paint':
+        return <PaintApp />
+      case 'notepad':
+        return <NotepadApp />
+      case 'calculator':
+        return <CalculatorApp />
       case 'application':
         return renderApplicationContent()
       case 'folder':
         return renderFolderContent()
-      case 'system':
-        return renderSystemContent()
-      case 'file':
-        return renderFileContent()
       default:
         return renderDefaultContent()
     }
@@ -51,7 +55,7 @@ export default function WindowContent({ window }) {
             <h2 className="text-lg font-bold mb-4 text-blue-800">About Me</h2>
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
-                Hi! I'm a passionate Visual Designer and Full-Stack Developer with a love for creating 
+                Hi! I&apos;m a passionate Visual Designer and Full-Stack Developer with a love for creating 
                 beautiful and functional digital experiences.
               </p>
               <p className="text-sm text-gray-700">
@@ -228,6 +232,222 @@ export default function WindowContent({ window }) {
   return (
     <div className="h-full">
       {renderContent()}
+    </div>
+  )
+}
+
+// Paint Application Component
+function PaintApp() {
+  const canvasRef = useRef(null)
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [color, setColor] = useState('#000000')
+  const [brushSize, setBrushSize] = useState(3)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (canvas) {
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+  }, [])
+
+  const startDrawing = (e) => {
+    setIsDrawing(true)
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    const rect = canvas.getBoundingClientRect()
+    ctx.beginPath()
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
+  }
+
+  const draw = (e) => {
+    if (!isDrawing) return
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    const rect = canvas.getBoundingClientRect()
+    ctx.strokeStyle = color
+    ctx.lineWidth = brushSize
+    ctx.lineCap = 'round'
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top)
+    ctx.stroke()
+  }
+
+  const stopDrawing = () => {
+    setIsDrawing(false)
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = 'white'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  }
+
+  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF']
+
+  return (
+    <div className="h-full bg-white flex flex-col">
+      {/* Toolbar */}
+      <div className="bg-gray-100 border-b border-gray-300 p-2 flex items-center space-x-4">
+        <button onClick={clearCanvas} className="px-3 py-1 text-xs bg-white border border-gray-400 hover:bg-gray-50">
+          Clear
+        </button>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs">Size:</span>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+            className="w-20"
+          />
+          <span className="text-xs w-8">{brushSize}px</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          {colors.map((c) => (
+            <button
+              key={c}
+              onClick={() => setColor(c)}
+              className={`w-6 h-6 border-2 ${color === c ? 'border-black' : 'border-gray-400'}`}
+              style={{ backgroundColor: c }}
+            />
+          ))}
+        </div>
+      </div>
+      {/* Canvas */}
+      <div className="flex-1 p-2 overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          width={760}
+          height={500}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          className="border border-gray-400 cursor-crosshair bg-white"
+        />
+      </div>
+    </div>
+  )
+}
+
+// Notepad Application Component
+function NotepadApp() {
+  const [text, setText] = useState('Welcome to my portfolio!\n\nThis is a Windows XP inspired website showcasing my work and skills.\n\nFeel free to explore!')
+
+  return (
+    <div className="h-full bg-white flex flex-col">
+      <div className="bg-gray-100 border-b border-gray-300 p-1 flex items-center space-x-2">
+        <button className="px-2 py-1 text-xs hover:bg-gray-200">File</button>
+        <button className="px-2 py-1 text-xs hover:bg-gray-200">Edit</button>
+        <button className="px-2 py-1 text-xs hover:bg-gray-200">Format</button>
+        <button className="px-2 py-1 text-xs hover:bg-gray-200">View</button>
+        <button className="px-2 py-1 text-xs hover:bg-gray-200">Help</button>
+      </div>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        className="flex-1 p-2 text-sm resize-none border-none outline-none font-mono"
+        placeholder="Type your text here..."
+      />
+    </div>
+  )
+}
+
+// Calculator Application Component
+function CalculatorApp() {
+  const [display, setDisplay] = useState('0')
+  const [previousValue, setPreviousValue] = useState(null)
+  const [operation, setOperation] = useState(null)
+  const [newNumber, setNewNumber] = useState(true)
+
+  const handleNumber = (num) => {
+    if (newNumber) {
+      setDisplay(num.toString())
+      setNewNumber(false)
+    } else {
+      setDisplay(display === '0' ? num.toString() : display + num)
+    }
+  }
+
+  const handleOperation = (op) => {
+    const current = parseFloat(display)
+    if (previousValue === null) {
+      setPreviousValue(current)
+    } else if (operation) {
+      const result = calculate(previousValue, current, operation)
+      setDisplay(result.toString())
+      setPreviousValue(result)
+    }
+    setOperation(op)
+    setNewNumber(true)
+  }
+
+  const calculate = (a, b, op) => {
+    switch (op) {
+      case '+': return a + b
+      case '-': return a - b
+      case '×': return a * b
+      case '/': return a / b
+      default: return b
+    }
+  }
+
+  const handleEquals = () => {
+    if (operation && previousValue !== null) {
+      const result = calculate(previousValue, parseFloat(display), operation)
+      setDisplay(result.toString())
+      setPreviousValue(null)
+      setOperation(null)
+      setNewNumber(true)
+    }
+  }
+
+  const handleClear = () => {
+    setDisplay('0')
+    setPreviousValue(null)
+    setOperation(null)
+    setNewNumber(true)
+  }
+
+  const handleDecimal = () => {
+    if (!display.includes('.')) {
+      setDisplay(display + '.')
+      setNewNumber(false)
+    }
+  }
+
+  return (
+    <div className="h-full bg-gray-100 p-3 flex flex-col">
+      <div className="bg-white border-2 border-gray-400 p-3 mb-3 text-right text-2xl font-mono h-12 flex items-center justify-end">
+        {display}
+      </div>
+      <div className="grid grid-cols-4 gap-2 flex-1">
+        <button onClick={handleClear} className="bg-red-200 hover:bg-red-300 border-2 border-gray-400 text-sm font-semibold">C</button>
+        <button onClick={() => setDisplay((parseFloat(display) * -1).toString())} className="bg-gray-200 hover:bg-gray-300 border-2 border-gray-400 text-sm font-semibold">±</button>
+        <button onClick={() => handleOperation('/')} className="bg-blue-200 hover:bg-blue-300 border-2 border-gray-400 text-sm font-semibold">/</button>
+        <button onClick={() => handleOperation('×')} className="bg-blue-200 hover:bg-blue-300 border-2 border-gray-400 text-sm font-semibold">×</button>
+        
+        <button onClick={() => handleNumber(7)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">7</button>
+        <button onClick={() => handleNumber(8)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">8</button>
+        <button onClick={() => handleNumber(9)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">9</button>
+        <button onClick={() => handleOperation('-')} className="bg-blue-200 hover:bg-blue-300 border-2 border-gray-400 text-sm font-semibold">-</button>
+        
+        <button onClick={() => handleNumber(4)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">4</button>
+        <button onClick={() => handleNumber(5)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">5</button>
+        <button onClick={() => handleNumber(6)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">6</button>
+        <button onClick={() => handleOperation('+')} className="bg-blue-200 hover:bg-blue-300 border-2 border-gray-400 text-sm font-semibold">+</button>
+        
+        <button onClick={() => handleNumber(1)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">1</button>
+        <button onClick={() => handleNumber(2)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">2</button>
+        <button onClick={() => handleNumber(3)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">3</button>
+        <button onClick={handleEquals} className="bg-green-200 hover:bg-green-300 border-2 border-gray-400 text-sm font-semibold row-span-2">=</button>
+        
+        <button onClick={() => handleNumber(0)} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold col-span-2">0</button>
+        <button onClick={handleDecimal} className="bg-white hover:bg-gray-50 border-2 border-gray-400 text-sm font-semibold">.</button>
+      </div>
     </div>
   )
 }

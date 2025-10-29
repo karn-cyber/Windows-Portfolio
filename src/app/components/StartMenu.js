@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+
 export default function StartMenu({ onClose, onOpenWindow }) {
   const menuItems = [
     {
@@ -7,74 +9,108 @@ export default function StartMenu({ onClose, onOpenWindow }) {
       name: 'Portfolio',
       icon: '👨‍💻',
       type: 'application',
-      description: 'View my work and projects'
+      description: 'View my work'
     },
     {
       id: 'resume',
       name: 'Resume',
       icon: '📄',
-      type: 'application',
+      type: 'pdf',
+      file: '/Resume-Neelanshu Karn (4).pdf',
       description: 'Download my CV'
+    },
+    {
+      id: 'notion-beta',
+      name: 'Notion Beta',
+      icon: '🌐',
+      type: 'link',
+      url: 'https://notion-beta-neel.vercel.app/',
+      description: 'My Notion project'
+    },
+    {
+      id: 'start-it',
+      name: 'Start-It App',
+      icon: '🚀',
+      type: 'link',
+      url: 'https://start-it-app.vercel.app/',
+      description: 'Startup platform'
     },
     {
       id: 'about',
       name: 'About Me',
-      icon: '👤',
+      icon: '�',
       type: 'application',
-      description: 'Learn more about me'
+      description: 'Learn more'
     },
     {
       id: 'contact',
       name: 'Contact',
-      icon: '📧',
+      icon: '✉️',
       type: 'application',
       description: 'Get in touch'
     },
-    {
-      id: 'projects',
-      name: 'My Projects',
-      icon: '⚡',
-      type: 'folder',
-      description: 'Browse my work'
-    },
     { type: 'separator' },
+    {
+      id: 'paint',
+      name: 'Paint',
+      icon: '🎨',
+      type: 'paint',
+      description: 'Image editor'
+    },
     {
       id: 'notepad',
       name: 'Notepad',
       icon: '📝',
-      type: 'system',
+      type: 'notepad',
       description: 'Text editor'
     },
     {
       id: 'calculator',
       name: 'Calculator',
-      icon: '🧮',
-      type: 'system',
-      description: 'Windows calculator'
-    },
-    {
-      id: 'paint',
-      name: 'Paint',
-      icon: '🎨',
-      type: 'system',
-      description: 'Image editor'
+      icon: '🔢',
+      type: 'calculator',
+      description: 'Calculator'
     }
   ]
 
   const handleItemClick = (item) => {
     if (item.type === 'separator') return
     
+    // Handle external links
+    if (item.type === 'link' && item.url) {
+      window.open(item.url, '_blank')
+      onClose()
+      return
+    }
+    
+    // Handle PDF
+    if (item.type === 'pdf' && item.file) {
+      window.open(item.file, '_blank')
+      onClose()
+      return
+    }
+    
     const windowData = {
       title: item.name,
       type: item.type,
       icon: item.icon,
-      width: 600,
-      height: 400,
+      width: item.type === 'paint' ? 800 : 600,
+      height: item.type === 'paint' ? 600 : 400,
       isMinimized: false,
       isMaximized: false
     }
     
     onOpenWindow(windowData)
+  }
+
+  const handleLogout = () => {
+    window.location.reload()
+  }
+
+  const handleShutdown = () => {
+    if (confirm('Are you sure you want to shut down?')) {
+      window.close()
+    }
   }
 
   return (
@@ -86,24 +122,43 @@ export default function StartMenu({ onClose, onOpenWindow }) {
       />
       
       {/* Start Menu */}
-      <div className="absolute bottom-8 left-1 w-80 bg-white border-2 border-gray-400 shadow-2xl z-50 rounded-tr-lg overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-3 flex items-center">
-          <div className="w-8 h-8 bg-white rounded-full mr-3 flex items-center justify-center">
-            <span className="text-blue-600 font-bold">👤</span>
-          </div>
-          <div>
-            <div className="font-semibold text-sm">Mitch Ivin</div>
-            <div className="text-xs opacity-90">Visual Designer</div>
+      <div className="absolute bottom-8 left-1 w-96 bg-white shadow-2xl z-50 overflow-hidden"
+        style={{
+          borderRadius: '8px 8px 0 0',
+          border: '2px solid',
+          borderColor: '#0054E3',
+          boxShadow: '0 0 20px rgba(0,0,0,0.3)'
+        }}
+      >
+        {/* Header with XP Logo */}
+        <div className="relative h-20"
+          style={{
+            background: 'linear-gradient(to right, #245EDC 0%, #3985FD 100%)'
+          }}
+        >
+          <div className="absolute inset-0 flex items-center px-4">
+            <Image 
+              src="/images/XPLOGO.png"
+              alt="Windows XP"
+              width={48}
+              height={48}
+              className="w-12 h-12 mr-3"
+            />
+            <div className="text-white">
+              <div className="text-2xl font-semibold italic">
+                Neelanshu
+                <span className="text-orange-400 text-lg ml-1">XP</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Menu Items */}
-        <div className="bg-white">
+        <div className="bg-white max-h-96 overflow-y-auto">
           {menuItems.map((item, index) => {
             if (item.type === 'separator') {
               return (
-                <div key={index} className="border-t border-gray-300 my-1" />
+                <div key={index} className="border-t-2 border-gray-300 my-1 mx-2" />
               )
             }
 
@@ -111,23 +166,20 @@ export default function StartMenu({ onClose, onOpenWindow }) {
               <div
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className="flex items-center px-4 py-2 hover:bg-blue-100 cursor-pointer transition-colors group"
+                className="flex items-center px-6 py-2 hover:bg-blue-50 cursor-pointer transition-colors group border-l-4 border-transparent hover:border-blue-500"
               >
-                <div className="w-8 h-8 flex items-center justify-center mr-3 text-lg">
+                <div className="w-8 h-8 flex items-center justify-center mr-4 text-xl">
                   {item.icon}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-800 group-hover:text-blue-800">
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-blue-700">
                     {item.name}
                   </div>
                   {item.description && (
-                    <div className="text-xs text-gray-600 group-hover:text-blue-600">
+                    <div className="text-xs text-gray-500 italic">
                       {item.description}
                     </div>
                   )}
-                </div>
-                <div className="w-4 h-4 flex items-center justify-center">
-                  <span className="text-gray-400 text-xs">▶</span>
                 </div>
               </div>
             )
@@ -135,14 +187,32 @@ export default function StartMenu({ onClose, onOpenWindow }) {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-100 border-t border-gray-300 p-2 flex items-center justify-between">
-          <button className="flex items-center space-x-2 px-3 py-1 hover:bg-gray-200 rounded text-sm">
-            <span>🔒</span>
-            <span>Log Off</span>
+        <div className="bg-blue-50 border-t-2 border-blue-200 p-3 flex items-center justify-end gap-2">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center space-x-2 px-4 py-2 hover:bg-orange-100 rounded transition-colors border-2 border-orange-300 bg-orange-50"
+          >
+            <Image
+              src="/images/Logout.png"
+              alt="Log off"
+              width={20}
+              height={20}
+              className="w-5 h-5"
+            />
+            <span className="text-sm font-semibold text-gray-700">Log Off</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-1 hover:bg-gray-200 rounded text-sm">
-            <span>⏻</span>
-            <span>Turn Off</span>
+          <button 
+            onClick={handleShutdown}
+            className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 rounded transition-colors border-2 border-red-300 bg-red-50"
+          >
+            <Image
+              src="/images/Shutdown.png"
+              alt="Turn off"
+              width={20}
+              height={20}
+              className="w-5 h-5"
+            />
+            <span className="text-sm font-semibold text-gray-700">Turn Off</span>
           </button>
         </div>
       </div>
