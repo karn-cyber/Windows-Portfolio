@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+
+/* Windows XP Font Styles */
+.xp-font {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 11px;
+}
+
+.xp-font-large {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+}
+
+/* XP Button Styles */
+.xp-button {
+  @apply bg-luna-silver border border-gray-400 px-3 py-1 text-xs;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
+}
+
+.xp-button:hover {
+  background: linear-gradient(to bottom, #f5f5f5 0%, #e5e5e5 100%);
+}
+
+.xp-button:active {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #ffffff;
+  border-bottom-color: #ffffff;
+  background: linear-gradient(to bottom, #d0d0d0 0%, #e0e0e0 100%);
+}
+
+/* XP Window Styles */
+.xp-window {
+  @apply bg-xp-window border-2;
+  border-top-color: #0054e3;
+  border-left-color: #0054e3;
+  border-right-color: #0054e3;
+  border-bottom-color: #0054e3;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.xp-window-header {
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 text-white px-2 py-1 text-sm font-semibold;
+  background: linear-gradient(to right, #0058e8 0%, #1e4cc9 100%);
+}
+
+.xp-window-header.inactive {
+  @apply bg-gradient-to-r from-gray-500 to-gray-700;
+}
+
+/* Scrollbar Styles */
+.xp-scrollbar::-webkit-scrollbar {
+  width: 16px;
+}
+
+.xp-scrollbar::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border: 1px solid #c0c0c0;
+}
+
+.xp-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f0f0f0 0%, #c0c0c0 100%);
+  border: 1px solid #808080;
+}
+
+.xp-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #e0e0e0 0%, #b0b0b0 100%);
+}
+
+/* Boot Screen Animation */
+@keyframes bootProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.boot-progress {
+  animation: bootProgress 3s ease-in-out;
+}
+
+/* Fade transitions */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 1000ms;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 1000ms;
+}
+
+/* Desktop icon styles */
+.desktop-icon {
+  @apply flex flex-col items-center justify-center w-20 h-20 p-2 rounded cursor-pointer;
+  transition: background-color 0.1s;
+}
+
+.desktop-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.desktop-icon.selected {
+  background-color: rgba(0, 84, 227, 0.3);
+  border: 1px dotted rgba(255, 255, 255, 0.8);
+}
+
+/* Start Menu Styles */
+.start-menu {
+  @apply bg-white border-2 border-gray-400 shadow-lg;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+}
+
+.start-menu-item {
+  @apply px-4 py-2 text-sm hover:bg-blue-100 cursor-pointer flex items-center;
+}
+
+.start-menu-item:hover {
+  background-color: #316ac5;
+  color: white;
+}
+
+/* Taskbar styles */
+.taskbar {
+  @apply bg-gradient-to-b from-blue-500 to-blue-700 border-t-2 border-blue-300;
+  background: linear-gradient(to bottom, #245edc 0%, #1e4cc9 100%);
+  height: 30px;
+}
