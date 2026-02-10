@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { WindowsIcon } from './WindowsIcons'
+import SpotifyPlayer from './SpotifyPlayer'
 
 export default function WindowContent({ window }) {
   const renderContent = () => {
@@ -11,6 +13,8 @@ export default function WindowContent({ window }) {
         return <NotepadApp />
       case 'calculator':
         return <CalculatorApp />
+      case 'spotify':
+        return <SpotifyPlayer />
       case 'application':
         return renderApplicationContent()
       case 'folder':
@@ -81,21 +85,25 @@ export default function WindowContent({ window }) {
           <div className="p-4 h-full overflow-auto">
             <h2 className="text-lg font-bold mb-4 text-blue-800">Contact Me</h2>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">📧</span>
-                <span className="text-sm">email@example.com</span>
+              <div className="flex items-center space-x-3 hover:bg-blue-50 p-2 rounded cursor-pointer transition" onClick={() => window.location.href = 'mailto:neelanshu.2024@nst.rishihood.edu.in'}>
+                <WindowsIcon type="mail" size={24} />
+                <span className="text-sm font-semibold text-blue-700 hover:underline">neelanshu.2024@nst.rishihood.edu.in</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">🔗</span>
-                <span className="text-sm">linkedin.com/in/yourprofile</span>
+              <div className="flex items-center space-x-3 hover:bg-blue-50 p-2 rounded cursor-pointer transition" onClick={() => window.open('https://www.linkedin.com/in/neelanshu-karn-05146130a/', '_blank')}>
+                <WindowsIcon type="link" size={24} />
+                <span className="text-sm font-semibold text-blue-700 hover:underline">LinkedIn Profile</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">🐙</span>
-                <span className="text-sm">github.com/yourusername</span>
+              <div className="flex items-center space-x-3 hover:bg-blue-50 p-2 rounded cursor-pointer transition" onClick={() => window.open('https://github.com/karn-cyber', '_blank')}>
+                <WindowsIcon type="github" size={24} />
+                <span className="text-sm font-semibold text-blue-700 hover:underline">GitHub Repository</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">🌐</span>
-                <span className="text-sm">yourwebsite.com</span>
+              <div className="flex items-center space-x-3 hover:bg-blue-50 p-2 rounded cursor-pointer transition" onClick={() => window.open('https://start-it-app.vercel.app/', '_blank')}>
+                <WindowsIcon type="globe" size={24} />
+                <span className="text-sm font-semibold text-blue-700 hover:underline">Start-It App</span>
+              </div>
+              <div className="flex items-center space-x-3 hover:bg-blue-50 p-2 rounded cursor-pointer transition" onClick={() => window.open('https://notion-beta-neel.vercel.app/', '_blank')}>
+                <WindowsIcon type="globe" size={24} />
+                <span className="text-sm font-semibold text-blue-700 hover:underline">Notion Beta</span>
               </div>
             </div>
           </div>
@@ -106,7 +114,9 @@ export default function WindowContent({ window }) {
           <div className="p-4 h-full overflow-auto">
             <h2 className="text-lg font-bold mb-4 text-blue-800">Resume</h2>
             <div className="text-center">
-              <div className="text-6xl mb-4">📄</div>
+              <div className="mb-4 flex justify-center">
+                <WindowsIcon type="document" size={96} />
+              </div>
               <p className="text-sm text-gray-600 mb-4">
                 Click the button below to download my resume
               </p>
@@ -123,6 +133,12 @@ export default function WindowContent({ window }) {
   }
 
   const renderFolderContent = () => {
+    const handleItemClick = (item) => {
+      if (item.url) {
+        window.open(item.url, '_blank')
+      }
+    }
+
     return (
       <div className="h-full bg-white">
         {/* Toolbar */}
@@ -138,16 +154,32 @@ export default function WindowContent({ window }) {
           <button className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded">← Back</button>
           <button className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded">→ Forward</button>
           <div className="flex-1 bg-white border border-gray-300 px-2 py-1 text-xs">
-            C:\Users\Mitch\{window.title}
+            C:\Users\Neelanshu\{window.title}
           </div>
         </div>
         
         {/* File listing */}
-        <div className="p-4 space-y-2">
-          {['Project 1.zip', 'Project 2.zip', 'Screenshots', 'Documentation'].map((item) => (
-            <div key={item} className="flex items-center space-x-3 hover:bg-blue-50 p-1 rounded">
-              <span className="text-lg">{item.includes('.') ? '📄' : '📁'}</span>
-              <span className="text-sm">{item}</span>
+        <div className="p-4 space-y-3">
+          {window.contents && window.contents.map((item) => (
+            <div 
+              key={item.id} 
+              className={`border border-gray-300 rounded p-3 bg-white ${item.url ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+              onClick={() => handleItemClick(item)}
+            >
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <WindowsIcon type={item.icon} size={32} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-700 text-sm">{item.name}</h3>
+                  {item.description && (
+                    <p className="text-xs text-gray-600 mt-1">{item.description}</p>
+                  )}
+                  {item.url && (
+                    <p className="text-xs text-blue-500 mt-1 hover:underline">{item.url}</p>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -205,7 +237,9 @@ export default function WindowContent({ window }) {
     return (
       <div className="p-4 h-full overflow-auto bg-white">
         <div className="text-center">
-          <div className="text-6xl mb-4">📄</div>
+          <div className="mb-4 flex justify-center">
+            <WindowsIcon type="document" size={96} />
+          </div>
           <h3 className="font-semibold text-gray-800 mb-2">{window.title}</h3>
           <p className="text-sm text-gray-600">
             This file can be opened with an associated application.

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Taskbar from './Taskbar'
 import StartMenu from './StartMenu'
 import WindowManager from './WindowManager'
+import { WindowsIcon } from './WindowsIcons'
 
 export default function Desktop() {
   const [showStartMenu, setShowStartMenu] = useState(false)
@@ -31,55 +32,85 @@ export default function Desktop() {
 
   const desktopIcons = [
     {
-      id: 'my-computer',
-      name: 'My Computer',
-      icon: '�️',
-      type: 'system'
-    },
-    {
-      id: 'my-documents',
-      name: 'My Documents',
-      icon: '�',
-      type: 'folder'
-    },
-    {
-      id: 'recycle-bin',
-      name: 'Recycle Bin',
-      icon: '🗑️',
-      type: 'system'
-    },
-    {
-      id: 'notion-beta',
-      name: 'Notion Beta',
-      icon: '🌐',
-      type: 'link',
-      url: 'https://notion-beta-neel.vercel.app/'
-    },
-    {
-      id: 'start-it',
-      name: 'Start-It App',
-      icon: '🚀',
-      type: 'link',
-      url: 'https://start-it-app.vercel.app/'
-    },
-    {
-      id: 'resume',
-      name: 'Resume.pdf',
-      icon: '📄',
-      type: 'pdf',
-      file: '/Resume-Neelanshu Karn (4).pdf'
-    },
-    {
-      id: 'portfolio',
-      name: 'Portfolio',
-      icon: '👨‍💻',
+      id: 'about-me',
+      name: 'About Me',
+      icon: 'user',
       type: 'application'
+    },
+    {
+      id: 'my-resume',
+      name: 'My Resume',
+      icon: 'folder',
+      type: 'folder',
+      contents: [
+        {
+          id: 'resume-pdf',
+          name: 'Neelanshu Karn - Resume.pdf',
+          icon: 'document',
+          type: 'pdf',
+          file: '/Resume-Neelanshu Karn (4).pdf'
+        }
+      ]
+    },
+    {
+      id: 'projects',
+      name: 'Projects',
+      icon: 'briefcase',
+      type: 'folder',
+      contents: [
+        {
+          id: 'notion-beta',
+          name: 'Notion Beta',
+          icon: 'globe',
+          type: 'link',
+          url: 'https://notion-beta-neel.vercel.app/',
+          description: 'A modern note-taking and collaboration platform'
+        },
+        {
+          id: 'start-it',
+          name: 'Start-It App',
+          icon: 'rocket',
+          type: 'link',
+          url: 'https://start-it-app.vercel.app/',
+          description: 'Startup project management and tracking application'
+        },
+        {
+          id: 'nebula',
+          name: 'Nebula',
+          icon: 'globe',
+          type: 'link',
+          url: 'https://nebula-last.vercel.app/',
+          description: 'Nebula project application'
+        },
+        {
+          id: 'repo-recommendation',
+          name: 'Repo Recommendation',
+          icon: 'globe',
+          type: 'link',
+          url: 'https://repo-recommendation.vercel.app/',
+          description: 'Repository recommendation engine'
+        },
+        {
+          id: 'evolver-app',
+          name: 'Evolver App',
+          icon: 'globe',
+          type: 'link',
+          url: 'https://evolver-app-sand.vercel.app/',
+          description: 'Evolver application'
+        }
+      ]
     },
     {
       id: 'contact',
       name: 'Contact Me',
-      icon: '✉️',
+      icon: 'mail',
       type: 'application'
+    },
+    {
+      id: 'spotify',
+      name: 'Music Player',
+      icon: 'computer',
+      type: 'spotify'
     }
   ]
 
@@ -123,6 +154,7 @@ export default function Desktop() {
       title: icon.name,
       type: icon.type,
       icon: icon.icon,
+      contents: icon.contents, // Pass folder contents to window
       x: Math.random() * 200 + 100,
       y: Math.random() * 100 + 100,
       width: 600,
@@ -182,7 +214,9 @@ export default function Desktop() {
                 top: `${20 + index * 80}px`
               }}
             >
-              <div className="text-2xl mb-1">{icon.icon}</div>
+              <div className="mb-1 flex justify-center">
+                <WindowsIcon type={icon.icon} size={48} />
+              </div>
               <div className="text-white text-xs text-center font-medium drop-shadow-lg leading-tight">
                 {icon.name}
               </div>

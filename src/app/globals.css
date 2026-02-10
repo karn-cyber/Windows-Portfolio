@@ -4,6 +4,15 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
 /* Windows XP Font Styles */
 .xp-font {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
