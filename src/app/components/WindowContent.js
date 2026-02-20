@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { WindowsIcon } from './WindowsIcons'
 import SpotifyPlayer from './SpotifyPlayer'
+import ChatBot from './ChatBot'
 
 export default function WindowContent({ window }) {
   const renderContent = () => {
@@ -15,6 +16,8 @@ export default function WindowContent({ window }) {
         return <CalculatorApp />
       case 'spotify':
         return <SpotifyPlayer />
+      case 'chatbot':
+        return <ChatBot />
       case 'application':
         return renderApplicationContent()
       case 'folder':

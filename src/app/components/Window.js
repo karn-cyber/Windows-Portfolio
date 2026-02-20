@@ -58,7 +58,7 @@ export default function Window({
   return (
     <div
       ref={windowRef}
-      className="absolute bg-gray-100 border-2 border-gray-400 shadow-lg pointer-events-auto"
+      className="absolute flex flex-col bg-gray-100 border-2 border-gray-400 shadow-lg pointer-events-auto overflow-hidden"
       style={{
         left: window.x,
         top: window.y,
@@ -75,7 +75,7 @@ export default function Window({
       {/* Window Header */}
       <div
         ref={headerRef}
-        className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-2 py-1 flex items-center justify-between cursor-move select-none"
+        className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-2 py-1 flex items-center justify-between cursor-move select-none"
         onMouseDown={handleMouseDown}
         style={{
           background: 'linear-gradient(to right, #0058e8 0%, #1e4cc9 100%)'
@@ -137,7 +137,7 @@ export default function Window({
       </div>
 
       {/* Window Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <WindowContent window={window} />
       </div>
     </div>

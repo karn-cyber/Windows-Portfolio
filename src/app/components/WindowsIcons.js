@@ -17,6 +17,7 @@ const iconMap = {
   notepad: 'Notepad.png',
   calculator: 'Calculator.png',
   computer: 'My Computer.png',
+  chat: 'MSN Messenger.png',
 }
 
 // Icon wrapper component with Windows XP styling

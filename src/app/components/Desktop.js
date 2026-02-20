@@ -111,6 +111,14 @@ export default function Desktop() {
       name: 'Music Player',
       icon: 'computer',
       type: 'spotify'
+    },
+    {
+      id: 'chatbot',
+      name: "Neel's Bot",
+      icon: 'chat',
+      type: 'chatbot',
+      width: 680,
+      height: 520
     }
   ]
 
@@ -157,8 +165,8 @@ export default function Desktop() {
       contents: icon.contents, // Pass folder contents to window
       x: Math.random() * 200 + 100,
       y: Math.random() * 100 + 100,
-      width: 600,
-      height: 400,
+      width: icon.width || 600,
+      height: icon.height || 400,
       isMinimized: false,
       isMaximized: false,
       zIndex: openWindows.length + 1

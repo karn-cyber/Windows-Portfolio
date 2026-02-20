@@ -88,6 +88,15 @@ export default function StartMenu({ onClose, onOpenWindow }) {
       icon: 'computer',
       type: 'spotify',
       description: 'Windows Media Player'
+    },
+    {
+      id: 'chatbot',
+      name: "Neel's Bot",
+      icon: 'chat',
+      type: 'chatbot',
+      description: 'Chat with my AI',
+      width: 680,
+      height: 520
     }
   ]
 
@@ -117,8 +126,8 @@ export default function StartMenu({ onClose, onOpenWindow }) {
       title: item.name,
       type: item.type,
       icon: item.icon,
-      width: item.type === 'paint' ? 800 : 600,
-      height: item.type === 'paint' ? 600 : 400,
+      width: item.width || (item.type === 'paint' ? 800 : 600),
+      height: item.height || (item.type === 'paint' ? 600 : 400),
       isMinimized: false,
       isMaximized: false
     }
