@@ -249,6 +249,8 @@ function ProjectTree({ project, onSelect }) {
   const [px,,pz] = project.treePos
   const trunkH = 3.5+Math.abs(Math.sin(px*0.5))*1.2
   const crownR  = 2.0+Math.abs(Math.cos(pz*0.4))*0.8
+  // Rotate sign group so it always faces inward toward the center (where player starts)
+  const signAngle = Math.atan2(-px, -pz)
   useFrame(({ clock }) => {
     if (signRef.current) signRef.current.rotation.y = Math.sin(clock.elapsedTime*0.4+px)*0.04
   })
@@ -279,6 +281,8 @@ function ProjectTree({ project, onSelect }) {
         <sphereGeometry args={[crownR*0.65,10,8]} />
         <meshStandardMaterial color="#196019" roughness={0.88} />
       </mesh>
+      {/* Sign direction wrapper — rotated so sign always faces inward toward player */}
+      <group rotation={[0, signAngle, 0]}>
       {/* Sign post */}
       <mesh position={[0,1.1,2.2]} castShadow>
         <cylinderGeometry args={[0.045,0.055,2.4,6]} />
@@ -325,6 +329,7 @@ function ProjectTree({ project, onSelect }) {
           </mesh>
         )}
       </group>
+      </group>{/* end signAngle wrapper */}
     </group>
   )
 }
@@ -417,7 +422,7 @@ function PlayerController({ onNearSign }) {
   const vel    = useRef(new THREE.Vector3())
   const yaw    = useRef(0)
   const pitch  = useRef(0)
-  const locked = useRef(false)
+  const drag   = useRef({ active: false, lastX: 0, lastY: 0, moved: false })
 
   useEffect(() => {
     camera.position.set(0,1.65,6)
@@ -435,22 +440,34 @@ function PlayerController({ onNearSign }) {
   useEffect(() => {
     const canvas = document.querySelector('canvas')
     if (!canvas) return
-    const onClick  = () => canvas.requestPointerLock()
-    const onChange = () => { locked.current = document.pointerLockElement===canvas }
-    const onMove   = e => {
-      if (!locked.current) return
-      yaw.current   -= e.movementX*0.002
-      pitch.current  = Math.max(-0.85, Math.min(0.85, pitch.current-e.movementY*0.002))
+    // Drag-to-look: hold left mouse button and drag to rotate camera.
+    // A plain click (no drag) passes through to R3F's onClick on 3D objects.
+    const onDown = e => {
+      if (e.button !== 0) return
+      drag.current = { active: true, lastX: e.clientX, lastY: e.clientY, moved: false }
     }
-    canvas.addEventListener('click', onClick)
-    document.addEventListener('pointerlockchange', onChange)
-    document.addEventListener('mousemove', onMove)
+    const onMove = e => {
+      if (!drag.current.active) return
+      const dx = e.clientX - drag.current.lastX
+      const dy = e.clientY - drag.current.lastY
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.current.moved = true
+      if (drag.current.moved) {
+        yaw.current   -= dx * 0.003
+        pitch.current  = Math.max(-0.85, Math.min(0.85, pitch.current - dy * 0.003))
+      }
+      drag.current.lastX = e.clientX
+      drag.current.lastY = e.clientY
+    }
+    const onUp = () => { drag.current.active = false }
+    canvas.addEventListener('mousedown', onDown)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup',   onUp)
     return () => {
-      canvas.removeEventListener('click', onClick)
-      document.removeEventListener('pointerlockchange', onChange)
-      document.removeEventListener('mousemove', onMove)
+      canvas.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup',   onUp)
     }
-  }, [camera])
+  }, [])
 
   useFrame((_, delta) => {
     const k = keys.current
@@ -482,76 +499,83 @@ function PlayerController({ onNearSign }) {
 
 // ── Welcome / intro sign board at entrance ──────────────────────────────────
 function WelcomeBoard() {
-  const postH = 3.0
-  const boardY = postH + 0.6
+  // Short cute foot-height signboard
+  const postH  = 0.52   // post ends here
+  const boardH = 0.68
+  const boardW = 1.90
+  const boardY = postH + boardH / 2 + 0.05  // board sits just above post top — no overlap
+
+  // North-east of player spawn [0,1.65,6], rotated to face the player
+  const bx = 3.0, bz = 2.0
+  const rotY = Math.atan2(0 - bx, 6 - bz)  // angle from board → player
+
   return (
-    <group position={[0, 0, 4.6]}>
-      {/* Post */}
+    <group position={[bx, 0, bz]} rotation={[0, rotY, 0]}>
+      {/* Short post — stays fully below the board */}
       <mesh position={[0, postH / 2, 0]} castShadow>
-        <cylinderGeometry args={[0.07, 0.09, postH, 8]} />
+        <cylinderGeometry args={[0.055, 0.07, postH, 8]} />
         <meshStandardMaterial color="#6b3d10" roughness={0.95} />
       </mesh>
       {/* Board backing */}
       <mesh position={[0, boardY, 0]} castShadow>
-        <boxGeometry args={[3.2, 1.3, 0.10]} />
+        <boxGeometry args={[boardW, boardH, 0.085]} />
         <meshStandardMaterial color="#c8954a" roughness={0.72} />
       </mesh>
-      {/* Front face (slightly lighter) */}
-      <mesh position={[0, boardY, 0.052]}>
-        <planeGeometry args={[3.1, 1.2]} />
+      {/* Front face */}
+      <mesh position={[0, boardY, 0.044]}>
+        <planeGeometry args={[boardW - 0.1, boardH - 0.08]} />
         <meshStandardMaterial color="#ddb97a" roughness={0.68} />
       </mesh>
       {/* Wood grain lines */}
-      {[-0.35, -0.12, 0.12, 0.35].map((y, i) => (
-        <mesh key={i} position={[0, boardY + y, 0.056]}>
-          <planeGeometry args={[2.95, 0.012]} />
+      {[-0.2, 0, 0.2].map((y, i) => (
+        <mesh key={i} position={[0, boardY + y, 0.047]}>
+          <planeGeometry args={[boardW - 0.14, 0.009]} />
           <meshStandardMaterial color="#b8924e" transparent opacity={0.3} />
         </mesh>
       ))}
       {/* Corner nails */}
-      {[[-1.42, 0.52], [1.42, 0.52], [-1.42, -0.52], [1.42, -0.52]].map(([nx, ny], i) => (
-        <mesh key={i} position={[nx, boardY + ny, 0.057]}>
-          <circleGeometry args={[0.032, 8]} />
+      {[[-0.82, 0.26], [0.82, 0.26], [-0.82, -0.26], [0.82, -0.26]].map(([nx, ny], i) => (
+        <mesh key={i} position={[nx, boardY + ny, 0.048]}>
+          <circleGeometry args={[0.026, 8]} />
           <meshStandardMaterial color="#aaa" metalness={0.85} roughness={0.25} />
         </mesh>
       ))}
       {/* Emoji */}
-      <Html center position={[0, boardY + 0.34, 0.08]} distanceFactor={5} zIndexRange={[10, 0]}>
-        <div style={{ fontSize: '22px', pointerEvents: 'none', userSelect: 'none', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}>
+      <Html center position={[0, boardY + 0.18, 0.07]} distanceFactor={4} zIndexRange={[10, 0]}>
+        <div style={{ fontSize: '13px', pointerEvents: 'none', userSelect: 'none', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }}>
           🦯
         </div>
       </Html>
       {/* Title */}
       <Text
-        position={[0, boardY + 0.07, 0.057]}
-        fontSize={0.22}
-        maxWidth={2.8}
-        lineHeight={1.22}
+        position={[0, boardY + 0.04, 0.048]}
+        fontSize={0.135}
+        maxWidth={1.72}
+        lineHeight={1.2}
         textAlign="center"
         color="#2a0e00"
         anchorX="center"
         anchorY="middle"
-        fontWeight="bold"
       >
         {'Products For Blinds'}
       </Text>
       {/* Subtitle */}
       <Text
-        position={[0, boardY - 0.28, 0.057]}
-        fontSize={0.115}
-        maxWidth={2.75}
+        position={[0, boardY - 0.2, 0.048]}
+        fontSize={0.072}
+        maxWidth={1.68}
         lineHeight={1.25}
         textAlign="center"
         color="#5a2e00"
         anchorX="center"
         anchorY="middle"
       >
-        {'The main project under which\nall these designs are made'}
+        {'Main project · all designs\nare made under this'}
       </Text>
-      {/* Subtle glow behind board */}
-      <mesh position={[0, boardY, -0.03]}>
-        <planeGeometry args={[3.4, 1.45]} />
-        <meshStandardMaterial color="#f5c060" emissive="#f5c060" emissiveIntensity={0.18} transparent opacity={0.28} />
+      {/* Warm glow behind board */}
+      <mesh position={[0, boardY, -0.025]}>
+        <planeGeometry args={[boardW + 0.2, boardH + 0.18]} />
+        <meshStandardMaterial color="#f5c060" emissive="#f5c060" emissiveIntensity={0.2} transparent opacity={0.22} />
       </mesh>
     </group>
   )
@@ -607,7 +631,7 @@ export default function GrassScene({ onSelectProject }) {
         </div>
       ) : (
         <div style={{ position:'absolute', bottom:14, left:'50%', transform:'translateX(-50%)', color:'rgba(255,255,255,0.55)', fontSize:11, fontFamily:'Segoe UI,Tahoma,sans-serif', textShadow:'0 1px 3px rgba(0,0,0,0.9)', pointerEvents:'none', textAlign:'center', whiteSpace:'nowrap', letterSpacing:'0.3px' }}>
-          WASD / Arrow Keys to walk  ·  Click canvas then move mouse to look around
+          WASD / Arrow Keys to walk  ·  Click & drag to look around  ·  Click a sign to open
         </div>
       )}
     </div>
