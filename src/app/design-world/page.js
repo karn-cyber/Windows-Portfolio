@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import XPWindow from '../components/XPWindow'
 import { DESIGN_PROJECTS } from '../components/GrassScene'
 
@@ -181,10 +182,12 @@ function ProjectModal({ project, onClose }) {
             <div>
               {/* Main image */}
               <div style={{ position: 'relative', width: '100%', paddingTop: '56%', background: '#1a1a1a', borderRadius: '4px', overflow: 'hidden', border: '2px inset #888', marginBottom: '8px' }}>
-                <img
+                <Image
                   src={images[imgIdx]}
                   alt={project.shortTitle}
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+                  fill
+                  unoptimized
+                  style={{ objectFit: 'contain' }}
                 />
                 {/* Prev / Next arrows */}
                 {images.length > 1 && (
@@ -208,13 +211,13 @@ function ProjectModal({ project, onClose }) {
               {images.length > 1 && (
                 <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
                   {images.map((src, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setImgIdx(i)}
-                      style={{ flexShrink: 0, width: 54, height: 40, border: i === imgIdx ? `2px solid ${project.color}` : '2px solid #aaa', borderRadius: 3, overflow: 'hidden', cursor: 'pointer', opacity: i === imgIdx ? 1 : 0.6, transition: 'opacity 0.15s' }}
-                    >
-                      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
+                      <div
+                        key={i}
+                        onClick={() => setImgIdx(i)}
+                        style={{ flexShrink: 0, width: 54, height: 40, border: i === imgIdx ? `2px solid ${project.color}` : '2px solid #aaa', borderRadius: 3, overflow: 'hidden', cursor: 'pointer', opacity: i === imgIdx ? 1 : 0.6, transition: 'opacity 0.15s', position: 'relative' }}
+                      >
+                        <Image src={src} alt="" fill unoptimized style={{ objectFit: 'cover' }} />
+                      </div>
                   ))}
                 </div>
               )}

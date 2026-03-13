@@ -6,26 +6,22 @@ import LoginScreen from './components/LoginScreen'
 import Desktop from './components/Desktop'
 
 export default function Home() {
-  // If the user has already booted+logged in this session, jump straight to desktop
-  const [currentScreen, setCurrentScreen] = useState(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('xp-booted') === 'true') {
-      return 'desktop'
-    }
-    return 'boot'
-  })
+  // Always start with 'boot' — server + client render the same HTML (no hydration mismatch)
+  const [currentScreen, setCurrentScreen] = useState('boot')
 
   useEffect(() => {
-    // Only run the boot timer when we're actually on the boot screen
-    if (currentScreen !== 'boot') return
-    const bootTimer = setTimeout(() => {
-      setCurrentScreen('login')
-    }, 8000)
+    // After hydration, immediately skip to desktop if already booted this session
+    if (sessionStorage.getItem('xp-booted') === 'true') {
+      setCurrentScreen('desktop')
+      return
+    }
+    // Normal boot timer
+    const bootTimer = setTimeout(() => setCurrentScreen('login'), 8000)
     return () => clearTimeout(bootTimer)
-  }, [currentScreen])
+  }, [])
 
   const handleLogin = () => {
     sessionStorage.setItem('xp-booted', 'true')
-    // xp-sound-played is intentionally NOT set here — Desktop sets it on first mount
     setCurrentScreen('desktop')
   }
 

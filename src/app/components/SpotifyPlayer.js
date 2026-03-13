@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 export default function SpotifyPlayer() {
   const [playlist] = useState([
@@ -29,6 +29,13 @@ export default function SpotifyPlayer() {
   const [duration, setDuration] = useState(0)
   const audioRef = useRef(null)
 
+    // Define handleNext BEFORE the useEffect that references it in deps (const TDZ fix)
+    const handleNext = useCallback(() => {
+      setCurrentTrack((prev) => (prev + 1) % playlist.length)
+      setIsPlaying(true)
+      setTimeout(() => audioRef.current?.play(), 100)
+    }, [playlist.length])
+
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -46,7 +53,7 @@ export default function SpotifyPlayer() {
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [currentTrack])
+  }, [currentTrack, handleNext])
 
   useEffect(() => {
     if (audioRef.current) {
@@ -61,12 +68,6 @@ export default function SpotifyPlayer() {
       audioRef.current?.play()
     }
     setIsPlaying(!isPlaying)
-  }
-
-  const handleNext = () => {
-    setCurrentTrack((prev) => (prev + 1) % playlist.length)
-    setIsPlaying(true)
-    setTimeout(() => audioRef.current?.play(), 100)
   }
 
   const handlePrevious = () => {
