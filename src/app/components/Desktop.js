@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Taskbar from './Taskbar'
 import StartMenu from './StartMenu'
 import WindowManager from './WindowManager'
 import { WindowsIcon } from './WindowsIcons'
 
 export default function Desktop() {
+  const router = useRouter()
   const [showStartMenu, setShowStartMenu] = useState(false)
   const [openWindows, setOpenWindows] = useState([])
   const [selectedIcons, setSelectedIcons] = useState([])
@@ -119,6 +121,12 @@ export default function Desktop() {
       type: 'chatbot',
       width: 680,
       height: 520
+    },
+    {
+      id: 'product-design',
+      name: 'Product Design',
+      icon: 'palette',
+      type: 'design-lab',
     }
   ]
 
@@ -144,6 +152,12 @@ export default function Desktop() {
   }
 
   const handleIconDoubleClick = (icon) => {
+    // Handle Design Lab — navigate to /design-world
+    if (icon.type === 'design-lab') {
+      router.push('/design-world')
+      return
+    }
+
     // Handle external links
     if (icon.type === 'link' && icon.url) {
       window.open(icon.url, '_blank')
