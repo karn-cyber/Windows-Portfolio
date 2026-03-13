@@ -14,8 +14,10 @@ export default function Desktop() {
   const [selectedIcons, setSelectedIcons] = useState([])
   const [time, setTime] = useState(new Date())
 
-  // Play Windows XP startup sound
+  // Play Windows XP startup sound — only on first boot, not when returning from sub-pages
   useEffect(() => {
+    if (sessionStorage.getItem('xp-sound-played') === 'true') return
+    sessionStorage.setItem('xp-sound-played', 'true')
     const audio = new Audio('/sounds/startup.mp3')
     audio.volume = 0.5 // Set volume to 50%
     audio.play().catch(error => {
